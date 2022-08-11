@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- 1.默认绑定规则
+    this 默认指向window
+    2.隐式绑定规则
+    谁调用指向谁（会存在隐式丢失和参数赋值两种情况，这会导致隐式绑定失败）
+    3.显式绑定call,apply.bind
+    4.new 绑定
+    绑定优先级:4>3>2>1 -->
+
+    <!-- <script>
+      console.log(this === Window);   //true
+        //函数独立调用
+        function test() {
+            console.log(this === Window);  
+        }
+        test();//相当于window.test();函数只要是独立调用，内部的this 就指向window
+        var a =0;
+        var obj = {
+            a:2,
+            foo:function(){
+              console.log(this);
+            //   function test() {
+            //   console.log(this);
+            //   }
+            //   test();   //独立调用，test中的this指向window
+              
+                // (function (){
+                //     console.log(this);
+                // })();   //立即执行函数this全都指向window(浏览器环境，执行环境会有区别指向相应的全局对象)
+                
+                function test(){
+                    console.log(this);
+                }
+                return test;
+            }
+
+        }
+
+        obj.foo()();    //闭包写法，还是指向window
+
+    </script> -->
+
+    <!-- <script>
+        //参数赋值的情况
+        var a = 0;
+        function foo(){
+
+          console.log(this);
+
+        }
+
+        function bar (fn){
+            fn();
+        } 
+        //父函数是有能力决定子函数的this指向的
+        
+        var obj ={
+            a:2,
+            foo:foo,
+        }
+
+        //预编译的过程中,形参要被实参赋值（值的拷贝的过程，浅拷贝）
+        bar(obj.foo);   //这个时候foo方法里的this 是指向window的
+
+
+    </script> -->
+
+    <!-- <script>
+        var a = 0;
+        function foo(a,b,c,d,e){
+          console.log(a,b,c,d,e);
+          console.log(this);
+        }
+
+        var obj ={
+            a:2,
+            foo:foo
+        }
+        obj.foo(1,2,3,4,5)
+        bar.call(obj,1,2,3,4,5);
+        bar.apply(obj,[1,2,3,4,5]);
+        bar.bind(obj)(1,2,3,4,5);//返回一个函数
+        bar.call(undefined,1,2,3,4,5);  //返回默认对象window
+        bar.apply(null,[1,2,3,4,5]);    //返回默认对象window
+
+    </script> -->
+
+    <!-- <script>
+        function Person(){
+                var this = {};
+                this.a = 1;
+                return this;
+        }
+
+        var person = new Person();   //this指向构造函数实例化的结果
+
+    </script> -->
+
+    <!-- 箭头函数 -->
+
+    <!-- <script>
+        var a = 0;
+        function foo() {
+            var that = this;
+          
+            var test = () => {
+                
+                console.log(this);
+                //箭头函数里其实是没有this的指向，拿的是父级作用域里的this
+            }
+            return test;
+        }
+
+        var obj1 = {
+            a:1,
+            foo:foo
+
+        }  
+        
+        var obj2 = {
+            a:2,
+            foo:foo
+
+        }
+       // obj1.foo()();   //默认绑定规则（独立调用对箭头函数）无效，因为箭头函数中的this是静态的无法改变
+       // var bar = foo().call(obj2);  //call apply bind无法改变箭头函数里的this指向window
+       
+       
+       // var obj = {
+        //     a:1,
+        //     foo:foo
+        // }
+        // obj.foo();    //显示绑定也无效
+
+
+        var foo =() => {
+            console.log(this);
+        }
+
+        new foo();    //new 不能实例箭头函数
+
+        //箭头函数：所有常规函数的绑定规则全部不适用
+        //箭头函数的this取决于父环境中的this指向；（=>函数不存在this指向>）
+
+    </script> -->
+
+        <!-- <script>
+            var name = 'window'
+            var obj1 = {
+                name: '1',
+                fn1: function () {
+                    console.log(this.name);
+                },
+                fn2: () => console.log(this.name); 
+                fn3: function () {
+                    return function() {
+                        console.log(this.name);
+                    }
+                },
+                fn4: function () {
+                    return () => console.log(this.name);
+                }  
+            }
+
+            var obj2 = {
+                name:"2"
+            };
+
+            obj1.fn1();   //1
+            obj1.fn1.call(obj2);  //2
+
+            obj1.fn2();   //window
+            obj2.fn2.call(obj2);    //window
+
+            obj1.fn3()();    //window
+            obj1.fn3().call(obj2);    //2    注意fn3不是箭头函数
+            obj1.fn3.call(obj2)();     //window
+
+            obj1.fn4()();   //1
+            obj1.fn4().call(obj2);   //1
+            obj1.fn4.call(obj2)();   //2
+
+        </script>  -->
+
+    <!-- <script>
+        function Foo () {
+
+            getName = function () {
+                console.log(1);
+            }
+            return this;
+
+        }
+
+        Foo.getName = function () {
+
+            console.log(2);
+
+        }
+
+        Foo.prototype.getName = function () {
+            console.log(3);
+        }
+
+        var getName = function () {
+            console.log(4);
+        }
+
+        function getName () {
+
+            console.log(5);
+        }
+
+        Foo.getName();  //2   直接执行Foo.getName
+        getName();    //4    直接执行getName  预编译的时候是5，执行的时候已经被修改为4了
+        Foo().getName();  //1   执行Foo方法，getName 又被改写为console.log(1)
+        getName();   //1     此时getName 已被重新改写为console.log(1)
+
+        new Foo.getName();    // 2   直接实例化Foo.getName
+        new Foo().getName();    //3    new Foo()实例化，返回this指向Foo,此时Foo继承祖先的getName,打印console.log(3)
+        new new Foo().getName();    //3     多加一个new相当于以new的形式执行一次new Foo().getName()的结果，还是3
+    </script>  -->
+
+
+
+</body>
+</html>
